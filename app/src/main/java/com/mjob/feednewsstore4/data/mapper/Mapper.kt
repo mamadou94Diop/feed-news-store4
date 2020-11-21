@@ -32,7 +32,7 @@ fun NewsResponse.toLocalNews(): LocalNews {
     with(this) {
         return LocalNews(
             author = author,
-            category = category.first().capitalize(),
+            category = (category.firstOrNull() ?: "General").capitalize(),
             description = description,
             id = id,
             image = image,

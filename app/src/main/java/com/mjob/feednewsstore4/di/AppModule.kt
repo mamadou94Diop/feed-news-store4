@@ -76,7 +76,6 @@ object AppModule {
     @FlowPreview
     @ExperimentalCoroutinesApi
     @InternalCoroutinesApi
-    @Singleton
     @Provides
     fun provideRepository(
         database: Database,

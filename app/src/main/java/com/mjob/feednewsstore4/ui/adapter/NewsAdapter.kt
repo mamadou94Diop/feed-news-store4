@@ -1,4 +1,4 @@
-package com.mjob.feednewsstore4.ui.home.adapter
+package com.mjob.feednewsstore4.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,12 +8,11 @@ import com.mjob.feednewsstore4.databinding.ItemNewsBinding
 import com.mjob.feednewsstore4.domain.model.News
 import com.mjob.feednewsstore4.load
 
-class NewsAdapter(private val newsList: List<News>, private val imageLoader: ImageLoader) : RecyclerView.Adapter<NewsViewHolder>() {
+class NewsAdapter(private var newsList: List<News>, private val imageLoader: ImageLoader) : RecyclerView.Adapter<NewsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val itemNewsBinding =
             ItemNewsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        itemNewsBinding.root.setPadding(0,0,0,0)
         return NewsViewHolder(itemNewsBinding, imageLoader)
     }
 
@@ -24,6 +23,10 @@ class NewsAdapter(private val newsList: List<News>, private val imageLoader: Ima
 
     override fun getItemCount(): Int {
         return newsList.size
+    }
+
+    fun setData(data: List<News>) {
+        newsList = data
     }
 }
 

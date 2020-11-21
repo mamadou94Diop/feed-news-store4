@@ -10,5 +10,5 @@ interface NewsRemoteDataSource {
     suspend fun getLatestNews(): FeedResponse
 
     @GET("v1/search?country=FR&language=en")
-    suspend fun getNewsByKeyword(@Query("q") keyword: String) : FeedResponse
+    suspend fun getNewsByKeyword(@Query("keywords") keyword: String) : FeedResponse
 }

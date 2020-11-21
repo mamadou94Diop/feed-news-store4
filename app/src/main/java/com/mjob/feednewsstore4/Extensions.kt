@@ -13,14 +13,9 @@ fun ImageView.load(uri: String, imageLoader: ImageLoader) {
         .data(uri)
         .target(this)
         .crossfade(true)
-        .crossfade(4000)
+        .crossfade(2000)
         .transformations(RoundedCornersTransformation(topLeft = 16f, topRight = 16f))
         .scale(Scale.FILL)
         .build()
     imageLoader.enqueue(request)
-}
-
-fun String.toDate(): Date {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-    return dateFormat.parse(this)!!
 }
