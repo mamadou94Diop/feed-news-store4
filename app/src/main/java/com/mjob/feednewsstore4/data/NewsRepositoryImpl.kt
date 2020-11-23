@@ -1,11 +1,12 @@
 package com.mjob.feednewsstore4.data
 
 import com.dropbox.android.external.store4.*
+import com.mjob.feednewsstore4.DispatcherProvider
 import com.mjob.feednewsstore4.data.local.dao.NewsLocalDataSource
 import com.mjob.feednewsstore4.data.local.model.LocalNews
 import com.mjob.feednewsstore4.data.mapper.toLocalNewsList
-import com.mjob.feednewsstore4.data.mapper.toNewsList
 import com.mjob.feednewsstore4.data.remote.NewsRemoteDataSource
+import com.mjob.feednewsstore4.data.remote.model.FeedResponse
 import com.mjob.feednewsstore4.domain.NewsRepository
 import com.mjob.feednewsstore4.domain.model.News
 import com.mjob.feednewsstore4.domain.model.Result
@@ -15,6 +16,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 
 @InternalCoroutinesApi
@@ -22,35 +24,35 @@ import kotlinx.coroutines.flow.flow
 @FlowPreview
 class NewsRepositoryImpl(
     private val localDataSource: NewsLocalDataSource,
-    private val remoteDataSource: NewsRemoteDataSource
+    private val remoteDataSource: NewsRemoteDataSource,
+    private val dispatcher: DispatcherProvider
 ) : NewsRepository {
 
-    private val storeForLatestNews: Store<String, List<LocalNews>> = StoreBuilder.from(
+    private val store: Store<String, List<LocalNews>> = StoreBuilder.from(
         fetcher = Fetcher.of { _: String ->
-            remoteDataSource.getLatestNews().toLocalNewsList()
+            remoteDataSource.getLatestNews()
         },
         sourceOfTruth = SourceOfTruth.Companion.of(
             reader = { key -> localDataSource.read() },
-            writer = { key: String, input: List<LocalNews> -> localDataSource.update(input) }
+            writer = { key: String, input: FeedResponse ->
+                val latestNews = input.toLocalNewsList()
+                localDataSource.update(latestNews)
+            }
         )
     ).build()
 
-    private val storeForNewsByKeyword: Store<String, List<News>> = StoreBuilder.from(
-        fetcher = Fetcher.of { key: String ->
-            remoteDataSource.getNewsByKeyword(key).toNewsList()
-        }
-    ).build()
 
     override suspend fun getLatestNews(): Flow<Result<List<News>>> {
         return flow {
-            storeForLatestNews.stream(StoreRequest.cached(key = "latest_news", refresh = true))
+            store.stream(StoreRequest.cached(key = "latest_news", refresh = true))
+                .flowOn(dispatcher.io())
                 .collect { response: StoreResponse<List<LocalNews>> ->
                     when (response) {
                         is StoreResponse.Loading -> {
                             print("[Store 4] Loading from ${response.origin} \n")
                             emit(Result.loading<List<News>>())
                         }
-                        is StoreResponse.Error ->{
+                        is StoreResponse.Error -> {
                             print("[Store 4] Error from  ${response.origin}  \n")
                             emit(Result.error<List<News>>())
                         }
@@ -62,18 +64,6 @@ class NewsRepositoryImpl(
                         is StoreResponse.NoNewData -> emit(Result.success(emptyList<News>()))
                     }
                 }
-        }
-    }
-
-    override suspend fun getNewsByKeyword(keyword: String): Flow<Result<List<News>>> {
-        return flow {
-            emit(Result.loading())
-            try {
-                val data = storeForNewsByKeyword.fresh(keyword)
-                emit(Result.success(data))
-            } catch (error: Throwable) {
-                emit(Result.error<List<News>>())
-            }
-        }
+        }.flowOn(dispatcher.io())
     }
 }

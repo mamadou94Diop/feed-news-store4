@@ -77,17 +77,6 @@ class LatestNewsFragment : Fragment() {
             }
         })
 
-        binding.searchBtn.setOnClickListener {
-            val keyword = binding.keywordTextfield.editText?.text.toString()
-            if (keyword.isNotEmpty()) {
-                val directions: NavDirections =
-                    LatestNewsFragmentDirections.actionLatestNewsFragmentToNewsWithKeywordFragment(
-                        keyword
-                    )
-                NavHostFragment.findNavController(this).navigate(directions)
-            }
-        }
-
         binding.swipeToRefreshLayout.setOnRefreshListener {
             print("[Store 4] Swipe to refresh layout  \n")
             getLatestNews()
