@@ -6,5 +6,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewsRepository {
     suspend fun getLatestNews(): Flow<Result<List<News>>>
-    suspend fun getNewsByKeyword(keyword: String): Flow<Result<List<News>>>
 }

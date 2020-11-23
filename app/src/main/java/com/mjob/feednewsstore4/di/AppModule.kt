@@ -6,6 +6,8 @@ import coil.ImageLoader
 import coil.util.DebugLogger
 import com.google.gson.GsonBuilder
 import com.mjob.feednewsstore4.BuildConfig
+import com.mjob.feednewsstore4.DispatcherProvider
+import com.mjob.feednewsstore4.DispatcherProviderImpl
 import com.mjob.feednewsstore4.R
 import com.mjob.feednewsstore4.data.NewsRepositoryImpl
 import com.mjob.feednewsstore4.data.local.Database
@@ -73,20 +75,24 @@ object AppModule {
             .build()
     }
 
+    @Provides
+    fun provideDispatcherProvider(): DispatcherProvider = DispatcherProviderImpl()
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     @InternalCoroutinesApi
     @Provides
     fun provideRepository(
         database: Database,
-        remoteDataSource: NewsRemoteDataSource
+        remoteDataSource: NewsRemoteDataSource,
+        dispatcherProvider: DispatcherProvider
     ): NewsRepository {
-        return NewsRepositoryImpl(database.dao(), remoteDataSource)
+        return NewsRepositoryImpl(database.dao(), remoteDataSource, dispatcherProvider)
     }
 
     @Singleton
     @Provides
-    fun providesImageLoader(@ApplicationContext context: Context) : ImageLoader {
+    fun providesImageLoader(@ApplicationContext context: Context): ImageLoader {
         return ImageLoader.Builder(context)
             .availableMemoryPercentage(1.0)
             .crossfade(true)

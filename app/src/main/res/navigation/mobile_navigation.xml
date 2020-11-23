@@ -9,23 +9,6 @@
         android:id="@+id/latest_news_fragment"
         android:name="com.mjob.feednewsstore4.ui.LatestNewsFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_latest_news" >
-        <action
-            android:id="@+id/action_latest_news_fragment_to_news_with_keyword_fragment"
-            app:destination="@id/news_with_keyword_fragment"
-            app:enterAnim="@android:anim/slide_out_right"
-            app:exitAnim="@android:anim/slide_in_left"
-            app:popEnterAnim="@anim/fragment_fade_enter"
-            app:popExitAnim="@anim/fragment_fade_exit"
-            app:popUpTo="@id/latest_news_fragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/news_with_keyword_fragment"
-        android:name="com.mjob.feednewsstore4.ui.NewsWithKeywordFragment"
-        android:label="fragment_news_with_keyword"
-        tools:layout="@layout/fragment_news_with_keyword" >
-        <argument android:name="keyword"
-            app:argType="string" />
-    </fragment>
+        tools:layout="@layout/fragment_latest_news" />
 
 </navigation>

@@ -23,12 +23,4 @@ class NewsViewModel @ViewModelInject constructor(
             newsLiveData = _newsLiveData
         }
     }
-
-    suspend fun getNewsWithKeyword(keyword: String) {
-        repository.getNewsByKeyword(keyword).collect {
-            _newsLiveData.value = it
-            newsLiveData = _newsLiveData
-        }
-    }
-
 }
